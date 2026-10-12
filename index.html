@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>App</title>
+    <title>Loading...</title>
     <script>
         window.addEventListener('DOMContentLoaded', () => {
 
@@ -16,15 +16,16 @@
                     const base64Encoded = btoa(unescape(encodeURIComponent(codeValue)));
 
 
-                    const targetUrl = `https://nbc-nu.github.io/n.u.-apps/view?c={base64Encoded}`;
+                    const targetUrl = "https://nbc-nu.github.io/n.u.-apps/view?c=" + base64Encoded;
+
 
                     window.location.href = targetUrl;
                 } catch (error) {
                     console.error("Error:", error);
-                    document.body.innerText = "Error: File.system.redirect.web is not working";
+                    document.body.innerText = "Error: REDIRECT_NOT_WORKING";
                 }
             } else {
-                document.body.innerText = "Error: No-code";
+                document.body.innerText = "Error: NO_CODE";
             }
         });
     </script>
