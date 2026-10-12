@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>App</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-family: sans-serif;
+      background-color: white;
+      color: #333;
+    }
+    h1 { margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Install this app!</h1>
+  <p>Click in the download button in the URL bar (chrome)<br>Click in + then, add at homescreen (samsung browser)<br>Click in the install button in the message that may appear in the screen. (other browsers)</p>
+
+  <script>
+
+    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
+
+    if (isPWA) {
+
+      const urlParams = new URLSearchParams(window.location.search);
+      const codeValue = urlParams.get('code');
+
+      if (codeValue) {
+        try {
+
+          const base64Encoded = btoa(unescape(encodeURIComponent(codeValue)));
+          
+
+          window.location.href = "https://nbc-nu.github.io/n.u.-apps/view?c=" + base64Encoded;
+        } catch (error) {
+          console.error("Error: ", error);
+
+          window.location.href = 'https://nbc-nu.github.io/n.u.-apps/';
+        }
+      } else {
+
+        window.location.href = 'https://nbc-nu.github.io/n.u.-apps/';
+      }
+    }
+
+
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('./sw.js');
+      });
+    }
+  </script>
+</body>
+</html>
