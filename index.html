@@ -26,33 +26,44 @@
   <p>Click in the download button in the URL bar (chrome)<br>Click in + then, add at homescreen (samsung browser)<br>Click in the install button in the message that may appear in the screen. (other browsers)</p>
 
   <script>
-
-    const isPWA = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone;
-
-    if (isPWA) {
-
+    // Função centralizada para processar a conversão e redirecionar
+    function executarRedirecionamentoPWA() {
       const urlParams = new URLSearchParams(window.location.search);
       const codeValue = urlParams.get('code');
 
       if (codeValue) {
         try {
-
           const base64Encoded = btoa(unescape(encodeURIComponent(codeValue)));
-          
-
-          window.location.href = "https://nbc-nu.github.io/n.u.-apps/view?c=" + base64Encoded;
+          window.location.href = "https://github.io" + base64Encoded;
         } catch (error) {
-          console.error("Error: ", error);
-
-          window.location.href = 'https://nbc-nu.github.io/n.u.-apps/';
+          console.error("Erro na codificação:", error);
+          window.location.href = 'https://github.io';
         }
       } else {
-
-        window.location.href = 'https://nbc-nu.github.io/n.u.-apps/';
+        window.location.href = 'https://github.io';
       }
     }
 
+    // 1. Verificação imediata se JÁ ABRIU dentro do PWA instalado
+    const queryPWA = window.matchMedia('(display-mode: standalone)');
+    if (queryPWA.matches || window.navigator.standalone) {
+      executarRedirecionamentoPWA();
+    }
 
+    // 2. Ouvinte dinâmico: Monitora se o modo standalone mudar enquanto a página estiver aberta
+    queryPWA.addEventListener('change', (e) => {
+      if (e.matches) {
+        executarRedirecionamentoPWA();
+      }
+    });
+
+    // 3. Ouvinte de evento nativo: Dispara na hora exata em que o usuário clica em "Instalar"
+    window.addEventListener('appinstalled', () => {
+      // Pequeno delay para o sistema operacional registrar a abertura do app
+      setTimeout(executarRedirecionamentoPWA, 500);
+    });
+
+    // Registro do Service Worker obrigatório
     if ('serviceWorker' in navigator) {
       window.addEventListener('load', () => {
         navigator.serviceWorker.register('./sw.js');
