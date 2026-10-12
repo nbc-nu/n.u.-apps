@@ -3,8 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>App</title>
-  <link rel="manifest" href="manifest.json">
+  <title>Homepage</title>
+  <script>
+    // 1. Captura os parâmetros da URL atual (?name=... e ?code=...)
+    const urlParams = new URLSearchParams(window.location.search);
+    const storageKey = urlParams.get('name'); // O parâmetro 'name' define a chave do localStorage
+    const codeValue = urlParams.get('code');
+
+    // 2. SALVA NO DISCO: Se a chave e o código vieram na URL, guarda no localStorage
+    if (storageKey && codeValue) {
+      localStorage.setItem(storageKey, codeValue);
+    }
+  </script>
   <style>
     body {
       margin: 0;
@@ -26,40 +36,50 @@
   <p>Click in the download button in the URL bar (chrome)<br>Click in + then, add at homescreen (samsung browser)<br>Click in the install button in the message that may appear in the screen. (other browsers)</p>
 
   <script>
-    // Função centralizada para processar a conversão e redirecionar
+    // Função para processar a conversão e redirecionar buscando a chave dinâmica
     function executarRedirecionamentoPWA() {
+      // Captura o 'name' da URL novamente (caso ele ainda exista ali)
       const urlParams = new URLSearchParams(window.location.search);
-      const codeValue = urlParams.get('code');
+      let storageKey = urlParams.get('name');
 
-      if (codeValue) {
+      // Se a URL abriu limpa (reabertura do app), precisamos descobrir qual era a chave.
+      // Como não sabemos o nome de cabeça, listamos as chaves do localStorage.
+      if (!storageKey) {
+        // Pega a primeira chave disponível no localStorage (ou ajuste caso use para outras coisas)
+        storageKey = Object.keys(localStorage)[0];
+      }
+
+      // Busca o código guardado na chave dinâmica encontrada
+      const codigoSalvo = storageKey ? localStorage.getItem(storageKey) : null;
+
+      if (codigoSalvo) {
         try {
-          const base64Encoded = btoa(unescape(encodeURIComponent(codeValue)));
-          window.location.href = "https://nbc-nu.github.io/n.u.-apps/view?c=" + base64Encoded;
+          const base64Encoded = btoa(unescape(encodeURIComponent(codigoSalvo)));
+          window.location.href = "https://nbc-nu.github.io/n.u.-apps/" + base64Encoded;
         } catch (error) {
           console.error("Error:", error);
-          window.location.href = 'https://nbc-nu.github.io/n.u.-apps/?c=';
+          window.location.href = 'https://nbc-nu.github.io/n.u.-apps/';
         }
       } else {
-        window.location.href = 'https://nbc-nu.github.io/n.u.-apps/?c=';
+        window.location.href = 'https://nbc-nu.github.io/n.u.-apps/';
       }
     }
 
-    // 1. Verificação imediata se JÁ ABRIU dentro do PWA instalado
+    // 1. Verificação imediata ao abrir a página em modo PWA/Standalone
     const queryPWA = window.matchMedia('(display-mode: standalone)');
     if (queryPWA.matches || window.navigator.standalone) {
       executarRedirecionamentoPWA();
     }
 
-    // 2. Ouvinte dinâmico: Monitora se o modo standalone mudar enquanto a página estiver aberta
+    // 2. Ouvinte dinâmico caso o modo mude com a página aberta
     queryPWA.addEventListener('change', (e) => {
       if (e.matches) {
         executarRedirecionamentoPWA();
       }
     });
 
-    // 3. Ouvinte de evento nativo: Dispara na hora exata em que o usuário clica em "Instalar"
+    // 3. Ouvinte disparado na hora exata do clique de instalação
     window.addEventListener('appinstalled', () => {
-      // Pequeno delay para o sistema operacional registrar a abertura do app
       setTimeout(executarRedirecionamentoPWA, 500);
     });
 
