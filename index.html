@@ -34,13 +34,13 @@
       if (codeValue) {
         try {
           const base64Encoded = btoa(unescape(encodeURIComponent(codeValue)));
-          window.location.href = "https://github.io" + base64Encoded;
+          window.location.href = "https://nbc-nu.github.io/n.u.-apps/view?c=" + base64Encoded;
         } catch (error) {
-          console.error("Erro na codificação:", error);
-          window.location.href = 'https://github.io';
+          console.error("Error:", error);
+          window.location.href = 'https://nbc-nu.github.io/n.u.-apps/?c=';
         }
       } else {
-        window.location.href = 'https://github.io';
+        window.location.href = 'https://nbc-nu.github.io/n.u.-apps/?c=';
       }
     }
 
